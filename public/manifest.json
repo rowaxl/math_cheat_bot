@@ -1,12 +1,12 @@
 {
   "id": "/",
   "scope": "/",
-  "name": "PWA Starter",
+  "name": "Math Cheat BOT",
   "display": "standalone",
   "start_url": "/",
   "short_name": "starter",
   "theme_color": "#E1477E",
-  "description": "This is a PWA Starter app",
+  "description": "Your math helper",
   "orientation": "any",
   "background_color": "#E1477E",
   "related_applications": [],
@@ -50,10 +50,17 @@
   ],
   "shortcuts": [
     {
-      "name": "Open About",
-      "short_name": "About",
-      "description": "Open the about page",
-      "url": "/about",
+      "name": "Open Calculator",
+      "short_name": "CALC",
+      "description": "Open the Calculator page",
+      "url": "/",
+      "icons": [{ "src": "assets/icons/icon_192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Open BOT",
+      "short_name": "BOT",
+      "description": "Open the BOT page",
+      "url": "/bot",
       "icons": [{ "src": "assets/icons/icon_192.png", "sizes": "192x192" }]
     }
   ]
