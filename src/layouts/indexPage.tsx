@@ -2,10 +2,11 @@ import Head from "next/head"
 import Display from "../components/display"
 import Layout from "../components/layout"
 import NumberPad from "../components/numberPad"
+import { IKey } from "../libs/consts"
 
 interface IndexPageLayoutProps {
   displayValue: string
-  handleKeyInput: (input: string) => void
+  handleKeyInput: (key: IKey) => void
 }
 
 const IndexPageLayout = ({

@@ -1,4 +1,4 @@
-import IndexPageController from "../controller/IndexPageController";
+import IndexPageController from "../controller/indexPage";
 
 const IndexPage = () => <IndexPageController />
 
