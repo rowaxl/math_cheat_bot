@@ -2,7 +2,7 @@ import { useState } from "react"
 import IndexPageLayout from "../layouts/IndexPageLayout"
 
 const IndexPageController = () => {
-  const [displayValue, setDisplayValue] = useState('')
+  const [displayValue, setDisplayValue] = useState('0')
   const handleKeyInput = (input: string) => {
     setDisplayValue(input)
   }
