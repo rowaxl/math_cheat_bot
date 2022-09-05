@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { IKey, KeyType, KEYS } from "../libs/consts"
+import { IKey, KeyType, KEYS, generateOperation } from "../libs/consts"
 import IndexPageLayout from "../layouts/indexPage"
 
 let queue:IKey[] = []
@@ -15,6 +15,8 @@ const IndexPageController = () => {
       return
     }
 
+    if (queue.length === 0) return
+
     // オペレーター処理
     switch(input.label) {
       case '=': {
@@ -22,7 +24,7 @@ const IndexPageController = () => {
         let results: unknown[] = []
         let tmp: string = ''
 
-        // 11 + 11 = 22
+        // parse keys to number
         for (const data of queue) {
           if (data.type === KeyType.operator) {
             results.push(parseFloat(tmp))
@@ -38,12 +40,36 @@ const IndexPageController = () => {
           results.push(tmp)
         }
 
-        // TODO: 演算
-        console.log({ results, tmp })
-        break;
+        console.log({queue, results})
+
+        // +-演算
+        let currentOperation = ''
+        let currentResult = results.reduce((previous, current, index) => {
+          if (index === 0) return current
+
+          if (typeof current === 'string') {
+            currentOperation = current
+            return previous
+          } else if (currentOperation) {
+            return generateOperation(currentOperation)(previous as number, current as number)
+          } else {
+            return current
+          }
+        }, 0)
+
+        results.push(currentResult)
+
+        setDisplayValue(results.join(''))
+        queue = []
+
+        return;
       }
       default: {
         if (queue.length < 1) return
+
+        if (queue[queue.length - 1].type === KeyType.operator) {
+          queue.pop()
+        }
 
         queue.push(input)
         setDisplayValue(queue.map(q => q.label).join(''))

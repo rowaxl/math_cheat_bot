@@ -45,7 +45,7 @@ export const KEYPAD = [
   KEYS.FOUR,
   KEYS.FIVE,
   KEYS.SIX,
-  KEYS.MINUS,
+  KEYS.SUB,
   KEYS.ONE,
   KEYS.TWO,
   KEYS.THREE,
@@ -54,3 +54,26 @@ export const KEYPAD = [
   KEYS.DOT,
   KEYS.EQUAL,
 ]
+
+export const generateOperation = (operator: string) => {
+  switch(operator) {
+    case '+': {
+      return (a: number, b: number) => a + b
+    }
+    case '-': {
+      return (a: number, b: number) => a - b
+    }
+    case '×': {
+      return (a: number, b: number) => a * b
+    }
+    case '÷': {
+      return (a: number, b: number) => {
+        if (b === 0) return 0
+        return a / b
+      }
+    }
+    default: {
+      return () => 0
+    }
+  }
+}
