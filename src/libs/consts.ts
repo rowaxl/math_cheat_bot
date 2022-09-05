@@ -10,6 +10,9 @@ export enum KeyType {
   arithmetic,
 }
 
+export const MULTIPLIER = '×'
+export const DIVIDER = '÷'
+
 export const KEYS = {
   ZERO: { label: '0', type: KeyType.number },
   ONE: { label: '1', type: KeyType.number },
@@ -27,8 +30,8 @@ export const KEYS = {
   PERCENTAGE: { label: '%', type: KeyType.operator },
   PLUS: { label: '+', type: KeyType.operator },
   SUB: { label: '-', type: KeyType.operator },
-  MULTI: { label: '×', type: KeyType.operator },
-  DIV: { label: '÷', type: KeyType.operator },
+  MULTI: { label: MULTIPLIER, type: KeyType.operator },
+  DIV: { label: DIVIDER, type: KeyType.operator },
   EQUAL: { label: '=', type: KeyType.operator },
   DOT: { label: '.', type: KeyType.number },
 }
@@ -54,26 +57,3 @@ export const KEYPAD = [
   KEYS.DOT,
   KEYS.EQUAL,
 ]
-
-export const generateOperation = (operator: string) => {
-  switch(operator) {
-    case '+': {
-      return (a: number, b: number) => a + b
-    }
-    case '-': {
-      return (a: number, b: number) => a - b
-    }
-    case '×': {
-      return (a: number, b: number) => a * b
-    }
-    case '÷': {
-      return (a: number, b: number) => {
-        if (b === 0) return 0
-        return a / b
-      }
-    }
-    default: {
-      return () => 0
-    }
-  }
-}

@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { IKey, KeyType, KEYS, generateOperation } from "../libs/consts"
+import { IKey, KeyType, MULTIPLIER, DIVIDER } from "../libs/consts"
+import { generateOperation, multiplyOrDiviseFirst } from "../libs/utils"
 import IndexPageLayout from "../layouts/indexPage"
 
 let queue:IKey[] = []
@@ -20,46 +21,52 @@ const IndexPageController = () => {
     // オペレーター処理
     switch(input.label) {
       case '=': {
+        if (queue[queue.length - 1].type === KeyType.operator) return
+
         queue.push(input)
-        let results: unknown[] = []
+
+        let numbers: number[] = []
+        let operators: string[] = []
         let tmp: string = ''
 
-        // parse keys to number
         for (const data of queue) {
           if (data.type === KeyType.operator) {
-            results.push(parseFloat(tmp))
+            numbers.push(parseFloat(tmp))
             tmp = ''
-            results.push(data.label)
+            if (data.label !== '=') operators.push(data.label)
           } else {
             tmp += data.label
           }
         }
 
-        // 残りをresultsに入れる
-        if (tmp) {
-          results.push(tmp)
-        }
+        console.log({
+          numbers,
+          operators,
+          isMultipleOperator: operators.length > 1,
+          includesMultiplierOrDivider: operators.some(operator => operator === MULTIPLIER || operator === DIVIDER),
+          notEveryOperatorMultiply: !operators.every(operator => operator === MULTIPLIER)
+        })
 
-        console.log({queue, results})
+        // 1 + 2 * 3 + 4 => 1 + 6 + 4に先行計算
+        // 掛け算・割り算を先にやる必要がある場面： 掛け算・割り算を含むoperatorが2つ以上ある かつ 掛け算だけではない
+        const {
+          copiedNumbers: priorOperatedNumbers,
+          copiedOperators: priorOperatedOperators
+        } = multiplyOrDiviseFirst(numbers, operators)
 
-        // +-演算
-        let currentOperation = ''
-        let currentResult = results.reduce((previous, current, index) => {
+        numbers = priorOperatedNumbers
+        operators = priorOperatedOperators
+
+        // 四則演算
+        const result = numbers.reduce((previous, current, index) => {
           if (index === 0) return current
 
-          if (typeof current === 'string') {
-            currentOperation = current
-            return previous
-          } else if (currentOperation) {
-            return generateOperation(currentOperation)(previous as number, current as number)
-          } else {
-            return current
-          }
+          const operator = operators.shift() || ''
+
+          return generateOperation(operator)(previous, current)
         }, 0)
 
-        results.push(currentResult)
-
-        setDisplayValue(results.join(''))
+        setDisplayValue(result.toString())
         queue = []
 
         return;
