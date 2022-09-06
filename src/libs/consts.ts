@@ -86,7 +86,10 @@ export const stringToKeys = (value: string): IKey[] => {
   }
 
   // trim last .00
-  if (keys[keys.length -1].label === KEYS.ZERO.label) {
+  if (
+    keys[keys.length -1].label === KEYS.ZERO.label &&
+    keys.some(key => key.label === KEYS.DOT.label)
+  ) {
     while(
       keys[keys.length -1].label === KEYS.ZERO.label ||
       keys[keys.length -1].label === KEYS.DOT.label
