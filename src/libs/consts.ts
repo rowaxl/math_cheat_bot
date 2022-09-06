@@ -64,10 +64,9 @@ export const KEYPAD = [
 ]
 
 export const findKey = (char: string) => {
-  const foundKey = Object.keys(KEYS).find((key) => {
-    console.log({ key: KEYS[key as KEY_NAME], char })
-    return KEYS[key as KEY_NAME].label === char
-  })
+  const foundKey = Object.keys(KEYS).find((key) =>
+    KEYS[key as KEY_NAME].label === char
+  )
 
   return foundKey ? KEYS[foundKey as KEY_NAME] : undefined
 }
@@ -79,12 +78,21 @@ export const stringToKeys = (value: string): IKey[] => {
 
   while(i < value.length) {
     const foundKey = findKey(chars.shift() as string)
-    console.log({ foundKey })
     if (foundKey) {
       keys.push(foundKey)
     }
 
     i++
+  }
+
+  // trim last .00
+  if (keys[keys.length -1].label === KEYS.ZERO.label) {
+    while(
+      keys[keys.length -1].label === KEYS.ZERO.label ||
+      keys[keys.length -1].label === KEYS.DOT.label
+    ) {
+      keys.pop()
+    }
   }
 
   return keys

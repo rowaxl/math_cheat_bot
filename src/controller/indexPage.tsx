@@ -64,7 +64,7 @@ const IndexPageController = () => {
         }, 0)
 
         setDisplayValue(result.toString())
-        queue = []
+        queue = stringToKeys(result.toString())
 
         return;
       }
@@ -124,16 +124,38 @@ const IndexPageController = () => {
 
         // 数字のみの場合は、 / 100する
         if (queue.every(q => q.type !== KeyType.operator)) {
-          const currentInput = queue.reduce((a, c) => a += c.label,'')
-          const percentaged = parseFloat(currentInput) / 100
+          const baseValue = queue.reduce((a, c) => a += c.label,'')
+          const percentaged = parseFloat(baseValue) / 100
 
           queue = stringToKeys(percentaged.toFixed(2))
-          break;
+        } else if (queue[queue.length - 1].type === KeyType.operator) {
+          // operatorで終わる場合は、[前の数字, operator, 前の数字％]
+          const lastNumberStartedAt = queue.filter(q => q.type === KeyType.operator).length > 1 ?
+            findLastIndex(queue.slice(0, queue.length - 1), (q) => q.type === KeyType.operator) :
+            0
+
+          const partialValue = queue.slice(lastNumberStartedAt, queue.length - 1).reduce((a, c) => a += c.label,'')
+          const percentaged = (parseFloat(partialValue) / 100) * parseFloat(partialValue)
+
+          queue.push(...stringToKeys(percentaged.toFixed(2)))
+        } else {
+          // 数字, operator, 数字の場合、[前の数字, operator, (次の数字 / 前の数字)％]
+          // 20 + 20%
+          const baseNumberStartedAt = queue.filter(q => q.type === KeyType.operator).length > 1 ?
+            findLastIndex(queue.slice(0, queue.length - 1), (q) => q.type === KeyType.operator) :
+            0
+
+          const lastNumberStartedAt = queue.filter(q => q.type === KeyType.operator).length > 1 ?
+            findLastIndex(queue.slice(0, queue.length - 1), (q) => q.type === KeyType.operator) :
+            findLastIndex(queue, (q) => q.type === KeyType.operator)
+
+          const partialBase = queue.slice(baseNumberStartedAt, lastNumberStartedAt).reduce((a, c) => a += c.label,'')
+          const partialPercentatge = queue.slice(lastNumberStartedAt, queue.length - 1).reduce((a, c) => a += c.label,'')
+          const percentaged = (parseFloat(partialPercentatge) / 100) * parseFloat(partialBase)
+
+          queue = [...queue.slice(0, lastNumberStartedAt + 1), ...stringToKeys(percentaged.toFixed(2))]
         }
-
-        // 数字, operatorの場合は、[前の数字, operator, 前の数字 * 数字％]
-        // 数字, operator, 数字の場合、[前の数字, operator, (次の数字 / 前の数字)％]
-
+        break
       }
       default: {
         if (queue.length < 1) return
