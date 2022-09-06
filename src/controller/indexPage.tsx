@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { IKey, KeyType, MULTIPLIER, DIVIDER } from "../libs/consts"
-import { generateOperation, multiplyOrDiviseFirst } from "../libs/utils"
+import { IKey, KeyType, KEYS, stringToKeys, } from "../libs/consts"
+import { findLastIndex, generateOperation, multiplyOrDiviseFirst } from "../libs/utils"
 import IndexPageLayout from "../layouts/indexPage"
 
 let queue:IKey[] = []
@@ -11,16 +11,21 @@ const IndexPageController = () => {
     if (queue.length > 20) return
 
     if (input.type === KeyType.number) {
-      queue.push(input)
+      if (queue.length === 0 || queue[queue.length - 1].type !== KeyType.parenthesis) {
+        queue.push(input)
+      } else {
+        queue.splice(queue.length - 1, 0, input)
+      }
+
       setDisplayValue(queue.map(q => q.label).join(''))
       return
     }
 
-    if (queue.length === 0) return
-
     // オペレーター処理
     switch(input.label) {
       case '=': {
+        if (queue.length < 1) return
+        if (queue.every(q => q.type !== KeyType.operator)) return
         if (queue[queue.length - 1].type === KeyType.operator) return
 
         queue.push(input)
@@ -34,18 +39,10 @@ const IndexPageController = () => {
             numbers.push(parseFloat(tmp))
             tmp = ''
             if (data.label !== '=') operators.push(data.label)
-          } else {
+          } else if (data.type !== KeyType.parenthesis) {
             tmp += data.label
           }
         }
-
-        console.log({
-          numbers,
-          operators,
-          isMultipleOperator: operators.length > 1,
-          includesMultiplierOrDivider: operators.some(operator => operator === MULTIPLIER || operator === DIVIDER),
-          notEveryOperatorMultiply: !operators.every(operator => operator === MULTIPLIER)
-        })
 
         // 1 + 2 * 3 + 4 => 1 + 6 + 4に先行計算
         // 掛け算・割り算を先にやる必要がある場面： 掛け算・割り算を含むoperatorが2つ以上ある かつ 掛け算だけではない
@@ -71,6 +68,73 @@ const IndexPageController = () => {
 
         return;
       }
+      case 'AC': {
+        // operator + 数字の場合、operator後の数字のみクリア
+        if (
+          queue.some(q => q.type === KeyType.operator) &&
+          queue[queue.length - 1].type !== KeyType.operator
+        ) {
+          const operatorIndex = findLastIndex(queue, q => q.type === KeyType.operator)
+          queue = queue.slice(0, operatorIndex + 1)
+
+          setDisplayValue(
+            queue.length > 0 ?
+              queue.map(q => q.label).join('') :
+              '0'
+          )
+          return
+        }
+
+        // 全初期化する
+        queue = []
+        break;
+      }
+      case '+/-': {
+        if (queue.length < 1) return
+
+        if (queue.some(q => q.type === KeyType.operator)) {
+          const operatorIndex = findLastIndex(queue, q => q.type === KeyType.operator)
+
+          // 最後がoperatorの場合、次の数字の符号を変える。数字がある場合、数字を括弧に入れる
+          if (operatorIndex === queue.length - 1) {
+            queue.splice(operatorIndex + 1, 0, KEYS.PARENTHESIS_OPEN, KEYS.MINUS, KEYS.PARENTHESIS_CLOSE)
+          } else if (queue[operatorIndex + 1].type !== KeyType.parenthesis) {
+            queue.splice(operatorIndex + 1, 0, KEYS.PARENTHESIS_OPEN, KEYS.MINUS)
+            queue.push(KEYS.PARENTHESIS_CLOSE)
+          } else {
+            const partial = queue.slice(operatorIndex + 1).filter(p => p.type === KeyType.number)
+            queue.splice(operatorIndex + 1, 0, ...partial)
+          }
+
+          setDisplayValue(queue.map(q => q.label).join(''))
+          return
+        }
+
+        if (queue[0].type === KeyType.parenthesis) {
+          queue = queue.filter(q => q.type !== KeyType.parenthesis && q.type !== KeyType.arithmetic)
+        } else {
+          queue.unshift(KEYS.PARENTHESIS_OPEN, KEYS.MINUS)
+          queue.push(KEYS.PARENTHESIS_CLOSE)
+        }
+
+        break;
+      }
+      case '%': {
+        if (queue.length < 1) return
+
+        // 数字のみの場合は、 / 100する
+        if (queue.every(q => q.type !== KeyType.operator)) {
+          const currentInput = queue.reduce((a, c) => a += c.label,'')
+          const percentaged = parseFloat(currentInput) / 100
+
+          queue = stringToKeys(percentaged.toFixed(2))
+          break;
+        }
+
+        // 数字, operatorの場合は、[前の数字, operator, 前の数字 * 数字％]
+        // 数字, operator, 数字の場合、[前の数字, operator, (次の数字 / 前の数字)％]
+
+      }
       default: {
         if (queue.length < 1) return
 
@@ -82,30 +146,6 @@ const IndexPageController = () => {
         setDisplayValue(queue.map(q => q.label).join(''))
         break;
       }
-      // case 'AC': {
-      //   if (queue.some(q => q.type === KeyType.operator) && queue[queue.length - 1].type === KeyType.operator) {
-      //     // 操作中かつ、最後の操作がoperatorでない場合、operatorまでの数字を初期化する
-      //     const operatorIndex = queue.findIndex(q => q.type === KeyType.operator && q.label !== '-')
-      //     queue = queue.slice(0, operatorIndex)
-      //     return
-      //   }
-
-      //   // 全初期化する
-      //   queue = []
-      //   break;
-      // }
-      // case '+/-': {
-      //   // 100 -> -100
-      //   // 100 + (-100)
-      //   break;
-      // }
-      // case '%': {
-      //   if (queue.length < 1 || queue[0].label === '0') return
-
-      //   if (queue.some(q => q.type === KeyType.operator)) {
-      //     // const
-      //   }
-      // }
     }
 
     setDisplayValue(

@@ -13,7 +13,7 @@ const NumberPad = ({ handleKeyInput }: NumberPadProps) => {
           <div
             className={`text-2xl text-center text-white cursor-pointer py-6 border-gray-600 border-b-2 border-l-2 transition-colors ${i % 4 === 3 && 'border-r-2'} ${type === KeyType.number ? 'bg-gray-400 active:bg-gray-700' : 'bg-orange-400 active:bg-orange-700'} ${label === '0' && 'col-span-2 rounded-bl-xl'} ${label === '=' && 'border-r-2 rounded-br-xl'}`}
             key={`keypad_button_${label}`}
-            onClick={() => {console.log({label, type}); handleKeyInput({ label, type })}}
+            onClick={() => {handleKeyInput({ label, type })}}
           >
             {label}
           </div>

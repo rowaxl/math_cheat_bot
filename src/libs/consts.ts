@@ -8,7 +8,10 @@ export enum KeyType {
   operator,
   number,
   arithmetic,
+  parenthesis,
 }
+
+type KEY_NAME = "AC" | "ZERO" | "ONE" | "TWO" | "THREE" | "FOUR" | "FIVE" | "SIX" | "SEVEN" | "EIGHT" | "NINE" | "CHANGE" | "MINUS" | "PERCENTAGE" | "PLUS" | "SUB" | "MULTI" | "DIV" | "EQUAL" | "DOT" | "PARENTHESIS_OPEN" | "PARENTHESIS_CLOSE"
 
 export const MULTIPLIER = '×'
 export const DIVIDER = '÷'
@@ -34,6 +37,8 @@ export const KEYS = {
   DIV: { label: DIVIDER, type: KeyType.operator },
   EQUAL: { label: '=', type: KeyType.operator },
   DOT: { label: '.', type: KeyType.number },
+  PARENTHESIS_OPEN: { label: '(', type: KeyType.parenthesis },
+  PARENTHESIS_CLOSE: { label: ')', type: KeyType.parenthesis },
 }
 
 export const KEYPAD = [
@@ -57,3 +62,30 @@ export const KEYPAD = [
   KEYS.DOT,
   KEYS.EQUAL,
 ]
+
+export const findKey = (char: string) => {
+  const foundKey = Object.keys(KEYS).find((key) => {
+    console.log({ key: KEYS[key as KEY_NAME], char })
+    return KEYS[key as KEY_NAME].label === char
+  })
+
+  return foundKey ? KEYS[foundKey as KEY_NAME] : undefined
+}
+
+export const stringToKeys = (value: string): IKey[] => {
+  const keys = []
+  const chars = value.split('')
+  let i = 0
+
+  while(i < value.length) {
+    const foundKey = findKey(chars.shift() as string)
+    console.log({ foundKey })
+    if (foundKey) {
+      keys.push(foundKey)
+    }
+
+    i++
+  }
+
+  return keys
+}
