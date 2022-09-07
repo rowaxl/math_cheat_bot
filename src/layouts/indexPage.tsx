@@ -27,8 +27,6 @@ const IndexPageLayout = ({
         <Display value={displayValue} />
         <NumberPad handleKeyInput={handleKeyInput} />
       </Layout>
-
-      <PageTab />
     </div>
   )
 }

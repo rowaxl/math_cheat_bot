@@ -14,13 +14,19 @@ const PageTab = () => {
   return (
     <div className="btm-nav">
       <button
-        className={`${currentTab === 'CALCULATOR' && 'active'}`}
+        className={`${currentTab === 'CALCULATOR' ?
+          'bg-blue-400 text-blue-800 active' :
+          'text-blue-200'
+        }`}
         onClick={() => { handleOnClikTab('CALCULATOR') }}
       >
         <span className="btm-nav-label">Calculator</span>
       </button>
       <button
-        className={`${currentTab === 'BOT' && 'active'}`}
+         className={`${currentTab === 'BOT' ?
+          'bg-blue-400 text-blue-800 active' :
+          'text-blue-200'
+        }`}
         onClick={() => { handleOnClikTab('BOT') }}
       >
         <span className="btm-nav-label">Math BOT</span>

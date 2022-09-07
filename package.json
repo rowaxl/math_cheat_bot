@@ -1,8 +1,7 @@
 {
-  "name": "pwa-starter",
+  "name": "math-bot",
   "version": "0.0.1",
-  "description": "A starter kit for building PWAs!",
-  "main": "index.js",
+  "description": "PWA calculator",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

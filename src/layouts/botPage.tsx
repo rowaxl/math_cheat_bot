@@ -1,14 +1,22 @@
 import Head from "next/head"
+import FormularForm from "../components/formularForm"
 import Layout from "../components/layout"
-import PageTab from "../components/pageTab"
-import { IKey } from "../libs/consts"
+import { Pod } from "../libs/type"
+import Pods from "../components/pods"
 
 interface BOTPageLayoutProps {
-  displayValue: string
-  handleKeyInput: (key: IKey) => void
+  handleSubmitQuery: (query: string) => void
+  handleReset: () => void
+  isLoading: boolean
+  podData?: Pod[]
 }
 
-const BotPageLayout = () => {
+const BotPageLayout = ({
+  handleSubmitQuery,
+  handleReset,
+  isLoading,
+  podData,
+}: BOTPageLayoutProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
@@ -17,9 +25,14 @@ const BotPageLayout = () => {
       </Head>
 
       <Layout>
-      </Layout>
+        <FormularForm
+          handleSubmit={handleSubmitQuery}
+          handleReset={handleReset}
+          isLoading={isLoading}
+        />
 
-      <PageTab />
+        <Pods pods={podData} />
+      </Layout>
     </div>
   )
 }
