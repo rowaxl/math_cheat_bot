@@ -21,7 +21,6 @@ const BotPageLayout = ({
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
         <title>Math Cheat: Your Math BOT</title>
-        <link rel="icon" href="/assets/favicon.ico" />
       </Head>
 
       <Layout>
