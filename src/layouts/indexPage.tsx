@@ -3,9 +3,7 @@ import Head from "next/head"
 import Display from "../components/display"
 import Layout from "../components/layout"
 import NumberPad from "../components/numberPad"
-import PageTab from "../components/pageTab"
 import { IKey } from "../libs/consts"
-import { TabContext } from "../context/tabContext"
 
 interface IndexPageLayoutProps {
   displayValue: string

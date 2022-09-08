@@ -1,18 +1,16 @@
 import type { AppProps } from 'next/app'
 import { useEffect, useState } from 'react'
-import { Tab, TabContext } from '../context/tabContext'
 import { ToastContainer, toast } from 'react-toastify'
 import { ServiceWorkerUpdateListener } from '../serviceWorkerUpdateListener'
 import { BeforeInstallPromptEvent } from '../libs/type'
 import '../styles/globals.css'
 import "react-toastify/dist/ReactToastify.css";
+import AppContextProvider from '../context/appContextProvider'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const [tabState, setTabState] = useState<Tab>('CALCULATOR')
   const [updateWaiting, setUpdateWaiting] = useState(false)
   const [registration, setRegistration] = useState(null)
   const [swListener, setSwListener] = useState({})
-  const [isOffline, setIsOffline] = useState(false)
 
   useEffect(() => {
     if (process.env.NODE_ENV === "development" || typeof window === undefined) return
@@ -64,14 +62,40 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
     const ready = (e: Event) => {
       e.preventDefault()
+      toast.dismiss()
+      if (localStorage.getItem('prompt-dismissed')) return
+
       const deferredPrompt = (e as BeforeInstallPromptEvent)
+
+      const handleInstallPWA = async () => {
+        deferredPrompt.prompt()
+        const { outcome } = await deferredPrompt.userChoice
+
+        if (outcome === 'dismissed') {
+          localStorage.setItem('prompt-dismissed', 'true')
+        }
+      }
+
+      const handleDismissPrompt = () => {
+        localStorage.setItem('prompt-dismissed', 'true')
+        toast.dismiss()
+      }
+
       toast.info(
-        <div>
-          <p>You can install App version!</p>
-          <button onClick={() => deferredPrompt.prompt()}>Install</button>
+        <div className="flex flex-col">
+          <p>You can use App version!</p>
+          <div className="flex flex-row gap-2 mt-2">
+            <button className="w-1/2 btn btn-primary" onClick={handleInstallPWA}>
+              Install it!
+            </button>
+            <button className="w-1/2 btn btn-outline btn-warning" onClick={handleDismissPrompt}>
+              Don't show this again
+            </button>
+          </div>
         </div>, {
         position: 'bottom-center',
         autoClose: false,
+        closeOnClick: false
       })
     }
 
@@ -82,26 +106,34 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     if (updateWaiting) {
+      const handleUpdate = () => {
+        console.log('apply updating sw')
+        toast.dismiss()
+        // @ts-ignore
+        swListener.skipWaiting(registration.waiting);
+      }
+
       toast.info(
-        <div>
+        <div className="flex flex-col">
           <p>New Version is Ready!</p>
-          <button onClick={() => {
-            // @ts-ignore
-            swListener.skipWaiting(registration.waiting);
-          }}>
+          <button className="btn btn-primary btn-outline" onClick={handleUpdate}>
             Update
           </button>
-        </div>, {
-        position: 'bottom-center',
-        autoClose: false,
-      })
+        </div>,
+        {
+          position: 'bottom-center',
+          autoClose: false,
+          closeOnClick: false,
+          closeButton: false
+        }
+      )
     }
   }, [updateWaiting])
 
   return (
-    <TabContext.Provider value={{ tabState, setTabState }}>
+    <AppContextProvider>
       <Component {...pageProps} />
       <ToastContainer />
-    </TabContext.Provider>
+    </AppContextProvider>
   )
 }

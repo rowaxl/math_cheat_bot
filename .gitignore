@@ -30,3 +30,6 @@ yarn-error.log*
 
 # sw
 /public/sw.js
+/public/fallback-*.js
+/public/workbox-*.js
+
