@@ -6,7 +6,7 @@
   "start_url": "/",
   "short_name": "MathBot",
   "theme_color": "#302e3b",
-  "description": "Your math helper",
+  "description": "Your math helper. POWERED BY Wolfram Alpha",
   "orientation": "any",
   "background_color": "#302e3b",
   "related_applications": [],

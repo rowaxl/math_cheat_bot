@@ -40,6 +40,7 @@ const FormularForm = ({
           />
           <label className="label pb-0">
             <span className="label-text-alt">sample: "pi", "What is 1+1?"</span>
+            <span className="label-text-alt">POWERED BY Wolfram Alpha</span>
           </label>
         </div>
       </div>
