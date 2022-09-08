@@ -6,7 +6,7 @@ import { Pod } from "../libs/type"
 
 const BotPageController = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [pods, setPods] = useState<Pod[]>([])
+  const [pods, setPods] = useState<Pod[]>()
 
   const handleSubmitQuery = async (query: string) => {
     setIsLoading(true)
@@ -18,7 +18,7 @@ const BotPageController = () => {
   }
 
   const handleReset = () => {
-    setPods([])
+    setPods(undefined)
   }
 
   return (
