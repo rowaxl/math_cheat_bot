@@ -1,5 +1,4 @@
 import { useState } from "react"
-import Image from "next/image"
 import { Pod } from "../libs/type"
 
 interface PodCardProps {
